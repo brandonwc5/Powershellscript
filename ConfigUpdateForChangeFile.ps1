@@ -55,10 +55,11 @@ function DeleteRollerSpeedLeft
 {
     param (
         [string] $f
+        [string] $FileName
     )
     Write-Host "Deleting build.roller.speed.left from all config files"
 	[string[]]$fileContent = Get-Content -Path $contentPath\$f -Encoding UTF8
-    $FileName = [System.IO.Path]::GetFileName($f)
+
     [string[]]$NewConfigFile = @()
     $RollerSpeed = [string]($fileContent -match 'build.roller.speed.left')
 
@@ -74,31 +75,24 @@ function AddNewKeyValue
 {
     param (
         [string] $f
+        [string] $FileName
     )
 	[string[]]$fileContent = Get-Content -Path $contentPath\$f -Encoding UTF8
-	$BuildTheTemp = GetBuildTemp $fileContent
-	$BuildTemp = [string]($fileContent -match 'build.default.build.temp')
-	# Return -1 if does not exist in this file
-    $indexOfBuildTemp = [array]::IndexOf($fileContent, $BuildTemp)
-    $BuildKey = ($fileContent[$indexOfBuildTemp] -split "=")[0]
-    $BuildValue = ($fileContent[$indexOfBuildTemp] -split "=")[1]
-    # Arbitrary updated value
-    $UpdatedBuildTemp = 100
+	$NewKeyValue = "new.test.key=value"
 
-    # Build temp key does not exist in material file
-    if($indexOfBuildTemp -gt 0)
-	{
-	    $fileContent | ForEach {$_ -replace $BuildValue, $UpdatedBuildTemp} | Set-Content $contentPath\$f
-	    Get-Content $contentPath\$f
-	}
+	$fileContent += $NewKeyValue
+	#Get-Content $contentPath\$f
+	Write-Host $fileContent
+	Pause
 }
 
 ForEach ($f in $content){
-	[string[]]$fileContent = Get-Content -Path $contentPath\$f -Encoding UTF8
+	$FileName = [System.IO.Path]::GetFileName($f)
 	#Write-Host $fileContent + "All contents of this config file"
 
-	$UpdateTheBuildTempValue = UpdateBuildTempValue $f
-	$DeleteTheRollerSpeed = DeleteRollerSpeedLeft $f
+	# $UpdateTheBuildTempValue = UpdateBuildTempValue $f
+	# $DeleteTheRollerSpeed = DeleteRollerSpeedLeft $f $FileName
+	$AddNewKeyValue = AddNewKeyValue $f $FileName
 }
 
 cd ../..
